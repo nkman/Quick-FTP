@@ -73,10 +73,13 @@ int main(int argc, char *argv[]){
   //     printf("\n Read Error \n");
   //   }
   // }
-    while(1){
-      scanf("%s", data_to_send);
-      send(sockfd, data_to_send, sizeof(data_to_send), 0);
-      memset(data_to_send, '0' ,sizeof(data_to_send));
-    }
+
+  while(1){
+    fgets(data_to_send, max_buffer_size, stdin);
+    send(sockfd, data_to_send, sizeof(data_to_send), 0);
+    memset(data_to_send, '0' ,sizeof(data_to_send));
+    n = read(sockfd, data_received, sizeof(data_received)-1);
+    fputs(data_received, stdout);
+  }
   return 0;
 }

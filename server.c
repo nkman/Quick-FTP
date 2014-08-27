@@ -7,6 +7,12 @@
 #include <errno.h>
 #include <string.h>
 #include <sys/types.h>
+#include <signal.h>
+
+void cleanExit(){
+  printf("Okay Exiting !!\n");
+  exit(0);
+}
 
 /*
 * header file for command definition.
@@ -14,7 +20,7 @@
 */
 #include </home/nkman/Desktop/Work/ftp/headers/server/variables.h>
 #include </home/nkman/Desktop/Work/ftp/headers/server/functions.h>
-
+#include </home/nkman/Desktop/Work/ftp/headers/server/command.h>
 
 int main(void)
 {
@@ -61,8 +67,20 @@ int main(void)
     connfd = accept(listenfd, (struct sockaddr*)NULL ,NULL); // accept awaiting request
     strcpy(data_send, "Message from server");
     write(connfd, data_send, strlen(data_send));
-    while(n = recv(connfd, data_rec,  max_buffer_size-1, 0))
-      printf("%s\n", data_rec);
+    signal(SIGINT, cleanExit);
+    n = recv(connfd, data_rec,  max_buffer_size-1, 0);
+    while(n && n < max_buffer_size){
+      printf("%u\n", n);
+      string_split(data_rec);
+      if(input.size > 0)
+        if(strcmp(input.cmd[0],com[0]) == 0)
+          printf("Lol\n");
+      printf("%s\n", input.cmd[0]);
+      strcpy(data_send, execute()); 
+      write(connfd, data_send, strlen(data_send));
+      n = recv(connfd, data_rec,  max_buffer_size-1, 0);
+    }
+
     close(connfd);
   }
   return 0;
