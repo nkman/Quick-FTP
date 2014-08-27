@@ -62,20 +62,21 @@ int main(int argc, char *argv[]){
     return 1;
   }
 
-  strcpy(data_to_send, "ls");
-
-  while((n = read(sockfd, data_received, sizeof(data_received)-1)) > 0){
-    data_received[n] = 0;
-    if(fputs(data_received, stdout) == EOF){
-      printf("\n Error : Fputs error");
-    }
-    printf("\n");
+  // while((n = read(sockfd, data_received, sizeof(data_received)-1)) > 0){
+  //   data_received[n] = 0;
+  //   if(fputs(data_received, stdout) == EOF){
+  //     printf("\n Error : Fputs error");
+  //   }
+  //   printf("\n");
   
-  if( n < 0){
-    printf("\n Read Error \n");
-  }
-  printf("%s\n", data_to_send);
-  send(sockfd, data_to_send, sizeof(data_to_send), 0);
-  }
+  //   if( n < 0){
+  //     printf("\n Read Error \n");
+  //   }
+  // }
+    while(1){
+      scanf("%s", data_to_send);
+      send(sockfd, data_to_send, sizeof(data_to_send), 0);
+      memset(data_to_send, '0' ,sizeof(data_to_send));
+    }
   return 0;
 }

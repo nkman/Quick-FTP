@@ -61,8 +61,8 @@ int main(void)
     connfd = accept(listenfd, (struct sockaddr*)NULL ,NULL); // accept awaiting request
     strcpy(data_send, "Message from server");
     write(connfd, data_send, strlen(data_send));
-    n = recv(connfd, data_rec,  max_buffer_size-1, 0);
-    printf("%s\n", data_rec);
+    while(n = recv(connfd, data_rec,  max_buffer_size-1, 0))
+      printf("%s\n", data_rec);
     close(connfd);
   }
   return 0;
