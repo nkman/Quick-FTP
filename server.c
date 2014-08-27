@@ -18,9 +18,10 @@
 
 int main(void)
 {
-  int listenfd = 0,connfd = 0;
+  socklen_t listenfd = 0,connfd = 0, n, clen;
   struct sockaddr_in socket_address;
-  char data[max_buffer_size];  
+  char data_send[max_buffer_size];
+  char data_rec[max_buffer_size];
 
   /*
   * Socket decriptor.
@@ -28,11 +29,15 @@ int main(void)
   */
 
   listenfd = socket(AF_INET, SOCK_STREAM, 0);
-  printf("socket retrieve success\n");
+  if(listenfd < 0)
+    perror("socket_create");
+  else
+    printf("socket retrieve success\n");
   
   memset(&socket_address, '0', sizeof(socket_address));
-  memset(data, '0', sizeof(data));
-  
+  memset(data_rec, '0', sizeof(data_rec));
+  memset(data_send, '0', sizeof(data_send));
+
   /*
   * All Machine,
   * Any Ip,
@@ -43,17 +48,21 @@ int main(void)
   socket_address.sin_addr.s_addr = htonl(INADDR_ANY); 
   socket_address.sin_port = htons(tcp_port);    
  
-  bind(listenfd, (struct sockaddr*)&socket_address,sizeof(socket_address));
+  if(bind(listenfd, (struct sockaddr*)&socket_address,sizeof(socket_address))<0)
+    perror("socket_bind");
   
   if(listen(listenfd, 10) == -1){
       printf("Failed to listen\n");
       return -1;
   }
-  
+
+  clen = sizeof(socket_address);
   while(1){
     connfd = accept(listenfd, (struct sockaddr*)NULL ,NULL); // accept awaiting request
-    strcpy(data, "Message from server");
-    write(connfd, data, strlen(data));
+    strcpy(data_send, "Message from server");
+    write(connfd, data_send, strlen(data_send));
+    n = recv(connfd, data_rec,  max_buffer_size-1, 0);
+    printf("%s\n", data_rec);
     close(connfd);
   }
   return 0;

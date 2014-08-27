@@ -16,11 +16,11 @@
 #include </home/nkman/Desktop/Work/ftp/headers/client/command.h>
 
 #define tcp_port 4505
-#define max_buffer_size 1024
+#define max_buffer_size 1023
 #define max_ip_length 16
 
 int main(int argc, char *argv[]){
-  int sockfd = 0,n = 0;
+  socklen_t sockfd = 0,n = 0;
 
   /*
   * destination ip of max length 16.
@@ -30,7 +30,8 @@ int main(int argc, char *argv[]){
   /*
   * data received, max 1024 bytes
   */
-  char data[max_buffer_size];
+  char data_to_send[max_buffer_size];
+  char data_received[max_buffer_size];
 
   if(argv[1]){
     strcpy(dest_ip, argv[1]);
@@ -42,7 +43,9 @@ int main(int argc, char *argv[]){
 
   struct sockaddr_in serv_addr;
 
-  memset(data, '0' ,sizeof(data));
+  memset(data_to_send, '0' ,sizeof(data_to_send));
+  memset(data_received, '0' ,sizeof(data_received));
+
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
   if(sockfd < 0){
@@ -59,17 +62,20 @@ int main(int argc, char *argv[]){
     return 1;
   }
 
-  while((n = read(sockfd, data, sizeof(data)-1)) > 0){
-    data[n] = 0;
-    if(fputs(data, stdout) == EOF){
+  strcpy(data_to_send, "ls");
+
+  while((n = read(sockfd, data_received, sizeof(data_received)-1)) > 0){
+    data_received[n] = 0;
+    if(fputs(data_received, stdout) == EOF){
       printf("\n Error : Fputs error");
     }
     printf("\n");
-  }
-
+  
   if( n < 0){
     printf("\n Read Error \n");
   }
-
+  printf("%s\n", data_to_send);
+  send(sockfd, data_to_send, sizeof(data_to_send), 0);
+  }
   return 0;
 }
