@@ -1,0 +1,75 @@
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <arpa/inet.h>
+
+/*
+* header file for command definition.
+* Hardcoded.
+*/
+#include </home/nkman/Desktop/Work/ftp/headers/client/command.h>
+
+#define tcp_port 4505
+#define max_buffer_size 1024
+#define max_ip_length 16
+
+int main(int argc, char *argv[]){
+  int sockfd = 0,n = 0;
+
+  /*
+  * destination ip of max length 16.
+  */
+  char dest_ip[max_ip_length];
+
+  /*
+  * data received, max 1024 bytes
+  */
+  char data[max_buffer_size];
+
+  if(argv[1]){
+    strcpy(dest_ip, argv[1]);
+  }
+  else{
+    printf("Destination ip not defined !!\n");
+    return 1;
+  }
+
+  struct sockaddr_in serv_addr;
+
+  memset(data, '0' ,sizeof(data));
+  sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+  if(sockfd < 0){
+    printf("\n Error : Could not create socket \n");
+    return 1;
+  }
+
+  serv_addr.sin_family = AF_INET;
+  serv_addr.sin_port = htons(tcp_port);
+  serv_addr.sin_addr.s_addr = inet_addr(dest_ip);
+
+  if(connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr))<0){
+    printf("\nCannot connect to server %s\n", dest_ip);
+    return 1;
+  }
+
+  while((n = read(sockfd, data, sizeof(data)-1)) > 0){
+    data[n] = 0;
+    if(fputs(data, stdout) == EOF){
+      printf("\n Error : Fputs error");
+    }
+    printf("\n");
+  }
+
+  if( n < 0){
+    printf("\n Read Error \n");
+  }
+
+  return 0;
+}
