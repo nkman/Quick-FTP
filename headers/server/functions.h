@@ -122,18 +122,17 @@ int supported(char *c){
 }
 
 char *run_command(int support){
-	FILE *fp; 
-	int i;
-	char _temp_data[100];
-	printf("Ha\n");
 	char *_data_ = malloc(1024*sizeof(char));
+	int i;
 	for(i=0;i<1024;i++)
 		_data_[i] = 0;
 
-	char temp_loc[100] = "/bin/ls ";
-	strcat(temp_loc, cwd);
-	printf("temp_loc is %s\n", temp_loc);
 	if(support == 2){
+		FILE *fp;
+		char _temp_data[100];
+		char temp_loc[100] = "/bin/ls ";
+
+		strcat(temp_loc, cwd);
 		fp = popen(temp_loc, "r");
 		if (fp == NULL) {
 			printf("Failed to run command\n" );
@@ -142,6 +141,9 @@ char *run_command(int support){
 		while (fgets(_temp_data, sizeof(_temp_data)-1, fp) != NULL) {
 			strcat(_data_, _temp_data);
 		}
+	}
+	else if(support == 1){
+		strcpy(_data_, run_command(2));
 	}
 	printf("%s\n", _data_);
 	return _data_;

@@ -3,9 +3,9 @@
 
 const char *com[4] = {
 	"exit\n",
-	"cd\n",
+	"cd",
 	"ls\n",
-	"get\n",
+	"get",
 };
 
 const unsigned int codes[] = { 
