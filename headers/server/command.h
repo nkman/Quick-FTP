@@ -2,10 +2,10 @@
 #define _HEADERS_SERVER_COMMAND_H
 
 const char *com[4] = {
-	"exit",
-	"cd",
-	"ls",
-	"get",
+	"exit\n",
+	"cd\n",
+	"ls\n",
+	"get\n",
 };
 
 const unsigned int codes[] = { 

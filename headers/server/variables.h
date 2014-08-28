@@ -18,5 +18,10 @@ typedef struct {
 	int size;
 }Input;
 
+typedef struct{
+	char data[1024];
+	char code;
+}packet;
+
 static Input input;// = (Input *)malloc(sizeof(Input));
 #endif /* _HEADERS_SERVER_VARIABLES_H */

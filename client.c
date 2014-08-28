@@ -14,11 +14,9 @@
 * Hardcoded.
 */
 #include </home/nkman/Desktop/Work/ftp/headers/client/command.h>
+#include </home/nkman/Desktop/Work/ftp/headers/client/variables.h>
 
-#define tcp_port 4505
-#define max_buffer_size 1023
-#define max_ip_length 16
-
+packet p;
 int main(int argc, char *argv[]){
   socklen_t sockfd = 0,n = 0;
 
@@ -43,8 +41,8 @@ int main(int argc, char *argv[]){
 
   struct sockaddr_in serv_addr;
 
-  memset(data_to_send, '0' ,sizeof(data_to_send));
-  memset(data_received, '0' ,sizeof(data_received));
+  // memset(data_to_send, '0' ,sizeof(data_to_send));
+  // memset(data_received, '0' ,sizeof(data_received));
 
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -61,7 +59,7 @@ int main(int argc, char *argv[]){
     printf("\nCannot connect to server %s\n", dest_ip);
     return 1;
   }
-
+  n = read(sockfd, cwd, sizeof(cwd)-1);
   // while((n = read(sockfd, data_received, sizeof(data_received)-1)) > 0){
   //   data_received[n] = 0;
   //   if(fputs(data_received, stdout) == EOF){
@@ -75,11 +73,13 @@ int main(int argc, char *argv[]){
   // }
 
   while(1){
+    printf("%s>>", cwd);
     fgets(data_to_send, max_buffer_size, stdin);
     send(sockfd, data_to_send, sizeof(data_to_send), 0);
     memset(data_to_send, '0' ,sizeof(data_to_send));
     n = read(sockfd, data_received, sizeof(data_received)-1);
     fputs(data_received, stdout);
+    printf("\n");
   }
   return 0;
 }
