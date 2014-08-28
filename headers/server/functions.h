@@ -42,7 +42,7 @@ void string_split(char *string){
 	}
 	j=0;
 	for(i=0;i<=str_len;i++){
-		if(string[i] && string[i] != ' ' && j<2){
+		if(string[i] && string[i] != ' ' && j<2 && string[i] != '\n'){
 			c[j][temp] = string[i];
 			temp++;
 		}
@@ -127,9 +127,10 @@ char *run_command(int support){
 	for(i=0;i<1024;i++)
 		_data_[i] = 0;
 
+	char _temp_data[100];
+
 	if(support == 2){
 		FILE *fp;
-		char _temp_data[100];
 		char temp_loc[100] = "/bin/ls ";
 
 		strcat(temp_loc, cwd);
@@ -141,12 +142,27 @@ char *run_command(int support){
 		while (fgets(_temp_data, sizeof(_temp_data)-1, fp) != NULL) {
 			strcat(_data_, _temp_data);
 		}
+		return _data_;
 	}
 	else if(support == 1){
-		strcpy(_data_, run_command(2));
+		char old_cwd[100];
+		strcpy(old_cwd, cwd);
+		strcat(old_cwd, "/");
+		strcat(old_cwd, input.cmd[1]);
+
+		strcpy(_temp_data, "cd ");
+		strcat(_temp_data, old_cwd);
+		printf("_temp_data is :%s\n", _temp_data);
+		if(system(_temp_data) == 0){
+			strcat(cwd, "/");
+			strcat(cwd, input.cmd[1]);
+		}
+		else{
+			printf("Directory %s not found\n", input.cmd[1]);
+		}
+		printf("Now cwd is :%s\n", cwd);
+		return cwd;
 	}
-	printf("%s\n", _data_);
-	return _data_;
 }
 
 #endif /* _HEADERS_SERVER_FUNCTIONS_H */

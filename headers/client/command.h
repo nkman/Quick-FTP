@@ -2,9 +2,9 @@
 #define _HEADERS_CLIENT_COMMAND_H
 
 const char *com[4] = {
-	"exit\n",
+	"exit",
 	"cd",
-	"ls\n",
+	"ls",
 	"get",
 };
 

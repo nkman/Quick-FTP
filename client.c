@@ -75,16 +75,17 @@ int main(int argc, char *argv[]){
 	while(1){
 		printf("%s>>", cwd);
 		fgets(data_to_send, max_buffer_size, stdin);
-		if(data_to_send[0] == com[1][0] && data_to_send[1]== com[1][1024]){
+		// if(data_to_send[0] == com[1][0] && data_to_send[1]== com[1][1]){
+		if(strcmp(data_to_send, com[1]) == 0){
 			send(sockfd, data_to_send, sizeof(data_to_send), 0);
-			memset(data_to_send, '0' ,sizeof(data_to_send));
-			memset(cwd, '0' ,sizeof(cwd));
-			n = read(sockfd, cwd, sizeof(data_received)-1);
-			fputs(data_received, stdout);
+			memset(data_to_send, '0' ,strlen(data_to_send));
+			memset(cwd, '0' ,strlen(cwd));
+			n = read(sockfd, cwd, sizeof(cwd)-1);
+			fputs(cwd, stdout);
 		}
 		else{
 			send(sockfd, data_to_send, sizeof(data_to_send), 0);
-			memset(data_to_send, '0' ,sizeof(data_to_send));
+			memset(data_to_send, '0' ,strlen(data_to_send));
 			memset(data_received, '0' ,strlen(data_received));
 			n = read(sockfd, data_received, sizeof(data_received)-1);
 			fputs(data_received, stdout);

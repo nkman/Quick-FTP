@@ -62,15 +62,17 @@ int main(void)
 			printf("Failed to listen\n");
 			return -1;
 	}
-	/*
-	* get working directory.
-	*/
-	if(getcwd(cwd, sizeof(cwd)) != NULL){
-		fprintf(stdout, "Working dir %s\n", cwd);
-	}
+	
 
 	clen = sizeof(socket_address);
 	while(1){
+		/*
+		* get working directory.
+		*/
+		if(getcwd(cwd, sizeof(cwd)) != NULL){
+			fprintf(stdout, "Working dir %s\n", cwd);
+		}
+	
 		connfd = accept(listenfd, (struct sockaddr*)NULL ,NULL); // accept awaiting request
 		strcpy(data_send, "Message from server");
 		write(connfd, cwd, strlen(cwd));
@@ -85,7 +87,15 @@ int main(void)
 			if((support = supported(input.cmd[0])) == -1){
 				strcpy(data_send,"Unsupported command");
 				write(connfd, data_send, strlen(data_send));
-			}
+			}/*
+			else if(support == 1){
+				p = execute(support);
+				if(p.code == 0){
+					close(connfd);
+					break;
+				}
+				write(connfd, cwd, strlen(p.data));
+			}*/
 			else{
 				p = execute(support);
 				if(p.code == 0){
