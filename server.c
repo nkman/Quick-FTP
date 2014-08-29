@@ -41,9 +41,9 @@ int main(void)
 	else
 		printf("socket retrieve success\n");
 	
-	// memset(&socket_address, '0', sizeof(socket_address));
-	// memset(data_rec, '0', sizeof(data_rec));
-	// memset(data_send, '0', sizeof(data_send));
+	memset(&socket_address, 0, sizeof(socket_address));
+	memset(data_rec, 0, sizeof(data_rec));
+	memset(data_send, 0, sizeof(data_send));
 
 	/*
 	* All Machine,
@@ -72,7 +72,7 @@ int main(void)
 		if(getcwd(cwd, sizeof(cwd)) != NULL){
 			fprintf(stdout, "Working dir %s\n", cwd);
 		}
-	
+
 		connfd = accept(listenfd, (struct sockaddr*)NULL ,NULL); // accept awaiting request
 		strcpy(data_send, "Message from server");
 		write(connfd, cwd, strlen(cwd));
@@ -80,22 +80,12 @@ int main(void)
 
 		n = recv(connfd, data_rec,	max_buffer_size-1, 0);
 		while(n && n < max_buffer_size){
-			printf("%s\n", data_rec);
 			string_split(data_rec);
 
-			printf("input.cmd[0] %s input.size %d\n", input.cmd[0], input.size);
 			if((support = supported(input.cmd[0])) == -1){
-				strcpy(data_send,"Unsupported command");
+				strcpy(data_send, "Unsupported command\n");
 				write(connfd, data_send, strlen(data_send));
-			}/*
-			else if(support == 1){
-				p = execute(support);
-				if(p.code == 0){
-					close(connfd);
-					break;
-				}
-				write(connfd, cwd, strlen(p.data));
-			}*/
+			}
 			else{
 				p = execute(support);
 				if(p.code == 0){
@@ -103,8 +93,9 @@ int main(void)
 					break;
 				}
 				write(connfd, p.data, strlen(p.data));
+				memset(p.data, 0, strlen(p.data));
 			}
-			n = recv(connfd, data_rec,	max_buffer_size-1, 0);
+			n = recv(connfd, data_rec, max_buffer_size-1, 0);
 		}
 		if(connfd > 0)
 			close(connfd);

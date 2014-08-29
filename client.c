@@ -17,6 +17,16 @@
 #include </home/nkman/Desktop/Work/ftp/headers/client/variables.h>
 
 packet p;
+void print_data_received(char *data_received){
+	int i;
+	for(i=0;i<strlen(data_received);i++){
+		if((data_received[i] == 0 && data_received[i+1] == 0) || (data_received[i] == '0' && data_received[i+1] == '0'))
+			return;
+		else
+			printf("%c", data_received[i]);
+	}
+}
+
 int main(int argc, char *argv[]){
 	socklen_t sockfd = 0,n = 0;
 
@@ -41,8 +51,8 @@ int main(int argc, char *argv[]){
 
 	struct sockaddr_in serv_addr;
 
-	// memset(data_to_send, '0' ,sizeof(data_to_send));
-	// memset(data_received, '0' ,sizeof(data_received));
+	memset(data_to_send, 0 ,sizeof(data_to_send));
+	memset(data_received, 0 ,sizeof(data_received));
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -73,23 +83,21 @@ int main(int argc, char *argv[]){
 	// }
 
 	while(1){
-		printf("%s>>", cwd);
+		print_data_received(cwd);
+		printf(">>");
 		fgets(data_to_send, max_buffer_size, stdin);
-		// if(data_to_send[0] == com[1][0] && data_to_send[1]== com[1][1]){
-		if(strcmp(data_to_send, com[1]) == 0){
+		if(data_to_send[0] == com[1][0] && data_to_send[1]== com[1][1]){
 			send(sockfd, data_to_send, sizeof(data_to_send), 0);
-			memset(data_to_send, '0' ,strlen(data_to_send));
-			memset(cwd, '0' ,strlen(cwd));
+			memset(data_to_send, 0, sizeof(data_to_send));
+			memset(cwd, 0, sizeof(cwd));
 			n = read(sockfd, cwd, sizeof(cwd)-1);
-			fputs(cwd, stdout);
 		}
 		else{
 			send(sockfd, data_to_send, sizeof(data_to_send), 0);
 			memset(data_to_send, '0' ,strlen(data_to_send));
 			memset(data_received, '0' ,strlen(data_received));
 			n = read(sockfd, data_received, sizeof(data_received)-1);
-			fputs(data_received, stdout);
-			printf("\n");
+			print_data_received(data_received);
 		}
 	}
 	return 0;
