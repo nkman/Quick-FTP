@@ -15,17 +15,9 @@
 */
 #include </home/nkman/Desktop/Work/ftp/headers/client/command.h>
 #include </home/nkman/Desktop/Work/ftp/headers/client/variables.h>
+#include </home/nkman/Desktop/Work/ftp/headers/client/functions.h>
 
 packet p;
-void print_data_received(char *data_received){
-	int i;
-	for(i=0;i<strlen(data_received);i++){
-		if((data_received[i] == 0 && data_received[i+1] == 0) || (data_received[i] == '0' && data_received[i+1] == '0'))
-			return;
-		else
-			printf("%c", data_received[i]);
-	}
-}
 
 int main(int argc, char *argv[]){
 	socklen_t sockfd = 0,n = 0;
@@ -86,17 +78,36 @@ int main(int argc, char *argv[]){
 		print_data_received(cwd);
 		printf(">>");
 		fgets(data_to_send, max_buffer_size, stdin);
-		if(data_to_send[0] == com[1][0] && data_to_send[1]== com[1][1]){
+		string_split(data_to_send);
+		// printf("input.cmd[0] is %s, input.cmd[1] is %s\n", input.cmd[0], input.cmd[1]);
+		
+		// if(data_to_send[0] == com[1][0] && data_to_send[1]== com[1][1]){
+		if(strcmp(input.cmd[0], com[1]) == 0){
 			send(sockfd, data_to_send, sizeof(data_to_send), 0);
 			memset(data_to_send, 0, sizeof(data_to_send));
 			memset(cwd, 0, sizeof(cwd));
 			n = read(sockfd, cwd, sizeof(cwd)-1);
+		}
+		else if(strcmp(input.cmd[0], com[3]) == 0){
+			FILE *fp;
+			fp = fopen(input.cmd[1], "a");
+			send(sockfd, data_to_send, sizeof(data_to_send), 0);
+			/*
+			while((n = read(sockfd, data_received, sizeof(data_received))) > 0){
+				printf("n is %d\n", n);
+				fprintf(fp, "%s", data_received);
+			}
+			*/
+			n = read(sockfd, data_received, sizeof(data_received));
+			fprintf(fp, "%s", data_received);
+			fclose(fp);
 		}
 		else{
 			send(sockfd, data_to_send, sizeof(data_to_send), 0);
 			memset(data_to_send, '0' ,strlen(data_to_send));
 			memset(data_received, '0' ,strlen(data_received));
 			n = read(sockfd, data_received, sizeof(data_received)-1);
+			printf("n is %d\n", n);
 			print_data_received(data_received);
 		}
 	}

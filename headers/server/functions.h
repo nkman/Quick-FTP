@@ -11,6 +11,8 @@ packet execute(int support);
 char *run_command(int support);
 static void define_cwd(void);
 static void rev_cwd(void);
+static void file_transfer(socklen_t connfd);
+
 /*
 * function to set cwd to current working directory.
 * which can be subjected to certain changes.
@@ -186,9 +188,29 @@ static void rev_cwd(){
 	if(j>0){
 		for(i=j+1;i<strlen(cwd);i++)
 			cwd[i] = 0;
-		// cwd[j+1] = '\0';
 	}
 	printf("going ../ size is %lu\n", strlen(cwd));
 }
 
+static void file_transfer(socklen_t connfd){
+	FILE *fp;
+	int i;
+	// char *content = malloc(max_buffer_size * sizeof(char));
+	char content[1024];
+	for(i=0;i<max_buffer_size;i++)
+		content[i] = 0;
+
+	fp = fopen(input.cmd[1], "r");
+	if(fp == NULL){
+		strcpy(content, "Error opening file.\n");
+		write(connfd, content, strlen(content));
+		return;
+	}
+	else{
+		while(fgets(content, 1000, fp) != NULL)
+			write(connfd, content, strlen(content));
+		fclose(fp);
+		return;
+	}
+}
 #endif /* _HEADERS_SERVER_FUNCTIONS_H */

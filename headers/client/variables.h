@@ -15,4 +15,13 @@ typedef struct{
 	char code;
 }packet;
 
+/*
+* Keeps information about input.
+*/
+typedef struct {
+	char cmd[2][100];
+	int size;
+}Input;
+
+static Input input;
 #endif /* _HEADERS_CLIENT_VARIABLES_H */

@@ -86,7 +86,7 @@ int main(void)
 				strcpy(data_send, "Unsupported command\n");
 				write(connfd, data_send, strlen(data_send));
 			}
-			else{
+			else if(support == 1 || support == 2){
 				p = execute(support);
 				if(p.code == 0){
 					close(connfd);
@@ -94,6 +94,9 @@ int main(void)
 				}
 				write(connfd, p.data, strlen(p.data));
 				memset(p.data, 0, strlen(p.data));
+			}
+			else if(support == 3){
+				file_transfer(connfd);
 			}
 			n = recv(connfd, data_rec, max_buffer_size-1, 0);
 		}
