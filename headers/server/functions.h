@@ -133,6 +133,7 @@ char *run_command(int support){
 		while (fgets(_temp_data, sizeof(_temp_data)-1, fp) != NULL) {
 			strcat(_data_, _temp_data);
 		}
+		// printf("%s\n", _data_);
 		return _data_;
 	}
 	else if(support == 1){
@@ -193,23 +194,64 @@ static void rev_cwd(){
 }
 
 static void file_transfer(socklen_t connfd){
-	FILE *fp;
+	int fp;
 	int i;
 	// char *content = malloc(max_buffer_size * sizeof(char));
 	char content[1024];
 	for(i=0;i<max_buffer_size;i++)
 		content[i] = 0;
 
-	fp = fopen(input.cmd[1], "r");
-	if(fp == NULL){
+	// fp = fopen(input.cmd[1], "r");
+	fp = open(input.cmd[1], O_RDONLY);
+	if(fp == -1){
 		strcpy(content, "Error opening file.\n");
-		write(connfd, content, strlen(content));
+		send(connfd, content, strlen(content), 0);
 		return;
 	}
 	else{
+		struct stat file_stat;
+		int remain_data, sent_bytes=0;
+		off_t offset;
+		char file_size[100];
+		ssize_t len;
+		/*
 		while(fgets(content, 1000, fp) != NULL)
 			write(connfd, content, strlen(content));
 		fclose(fp);
+		*/
+		/* Get file stats */
+        if (fstat(fp, &file_stat) < 0){
+			fprintf(stderr, "Error fstat --> %s", strerror(errno));
+			/*write first !!*/
+			return;
+		}
+		offset = 0;
+		remain_data = file_stat.st_size;
+
+		sprintf(file_size, "%lu", file_stat.st_size);
+		/*
+		* Send file info.
+		*/
+		// len = send(connfd, file_size, sizeof(file_size), 0);
+		len = write(connfd, file_size, sizeof(file_size));
+
+		if(len < 0) {
+			fprintf(stderr, "Error on sending size info %s", strerror(errno));
+			/*write*/
+			return;
+		}
+		int count = 0;
+		// sent_bytes = sendfile(connfd, fp, (-1)*BUFSIZ, BUFSIZ);
+		// remain_data -= sent_bytes;
+
+		while (remain_data > 0){
+			fprintf(stdout, "1. Server sent %d bytes from file's data, offset is now : %lu and remaining data = %d\n", sent_bytes, offset, remain_data);
+			sent_bytes = sendfile(connfd, fp, &offset, BUFSIZ);
+			remain_data -= sent_bytes;
+			fprintf(stdout, "2. Server sent %d bytes from file's data, offset is now : %lu and remaining data = %d\n", sent_bytes, offset, remain_data);
+			count++;
+		}
+		fprintf(stdout, "File sent. count is %d, BUFSIZ is %d\n", count, BUFSIZ);
 		return;
 	}
 }

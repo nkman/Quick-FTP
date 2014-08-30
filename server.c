@@ -8,6 +8,9 @@
 #include <string.h>
 #include <sys/types.h>
 #include <signal.h>
+#include <sys/sendfile.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 /*
 * header file for command definition.
@@ -42,8 +45,8 @@ int main(void)
 		printf("socket retrieve success\n");
 	
 	memset(&socket_address, 0, sizeof(socket_address));
-	memset(data_rec, 0, sizeof(data_rec));
-	memset(data_send, 0, sizeof(data_send));
+	memset(&data_rec, 0, sizeof(data_rec));
+	memset(&data_send, 0, sizeof(data_send));
 
 	/*
 	* All Machine,
@@ -76,29 +79,36 @@ int main(void)
 		connfd = accept(listenfd, (struct sockaddr*)NULL ,NULL); // accept awaiting request
 		strcpy(data_send, "Message from server");
 		write(connfd, cwd, strlen(cwd));
-		signal(SIGINT, cleanExit);
+		// send(connfd, cwd, sizeof(cwd), 0);
 
-		n = recv(connfd, data_rec,	max_buffer_size-1, 0);
+		// n = recv(connfd, data_rec,	max_buffer_size, 0);
+		n = read(connfd, data_rec,	max_buffer_size);
 		while(n && n < max_buffer_size){
+			signal(SIGINT, cleanExit);
+
 			string_split(data_rec);
 
 			if((support = supported(input.cmd[0])) == -1){
 				strcpy(data_send, "Unsupported command\n");
 				write(connfd, data_send, strlen(data_send));
+				// send(connfd, data_send, sizeof(data_send), 0);
 			}
 			else if(support == 1 || support == 2){
 				p = execute(support);
 				if(p.code == 0){
+					/* Todo : Send a signal which will close at client side*/
 					close(connfd);
 					break;
 				}
 				write(connfd, p.data, strlen(p.data));
-				memset(p.data, 0, strlen(p.data));
+				// send(connfd, p.data, sizeof(p.data), 0);
+				memset(&p.data, 0, sizeof(p.data));
 			}
 			else if(support == 3){
 				file_transfer(connfd);
 			}
-			n = recv(connfd, data_rec, max_buffer_size-1, 0);
+			// n = recv(connfd, data_rec, max_buffer_size, 0);
+			n = read(connfd, data_rec, max_buffer_size);
 		}
 		if(connfd > 0)
 			close(connfd);
