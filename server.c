@@ -8,6 +8,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <signal.h>
+
 #include <sys/sendfile.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -16,9 +17,9 @@
 * header file for command definition.
 * Hardcoded.
 */
-#include </home/nkman/Desktop/Work/ftp/headers/server/command.h>
-#include </home/nkman/Desktop/Work/ftp/headers/server/variables.h>
-#include </home/nkman/Desktop/Work/ftp/headers/server/functions.h>
+#include <headers/server/command.h>
+#include <headers/server/variables.h>
+#include <headers/server/functions.h>
 
 /*
 * data to send.

@@ -13,9 +13,9 @@
 * header file for command definition.
 * Hardcoded.
 */
-#include </home/nkman/Desktop/Work/ftp/headers/client/command.h>
-#include </home/nkman/Desktop/Work/ftp/headers/client/variables.h>
-#include </home/nkman/Desktop/Work/ftp/headers/client/functions.h>
+#include <headers/client/command.h>
+#include <headers/client/variables.h>
+#include <headers/client/functions.h>
 
 packet p;
 
